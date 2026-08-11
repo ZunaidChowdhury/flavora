@@ -27,9 +27,10 @@ interface Envelope<T> {
 async function request<T>(
   url: string,
   method: "GET" | "POST" | "PUT" | "DELETE",
-  body?: unknown
+  body?: unknown,
+  auth = true
 ): Promise<T> {
-  const token = await getToken();
+  const token = auth ? await getToken() : undefined;
 
   const res = await fetch(`${BASE_URL}${url}`, {
     method,
@@ -53,8 +54,8 @@ async function request<T>(
   return json.data as T;
 }
 
-export const serverFetch = <T>(url: string, _options?: RequestInit) =>
-  request<T>(url, "GET");
+export const serverFetch = <T>(url: string, options?: { auth?: boolean }) =>
+  request<T>(url, "GET", undefined, options?.auth !== false);
 
 export const serverMutation = <T>(
   url: string,

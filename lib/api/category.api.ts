@@ -7,7 +7,7 @@ export type CategorySummary = {
 };
 
 export const fetchCategories = () =>
-  serverFetch<CategorySummary[]>("/categories");
+  serverFetch<CategorySummary[]>("/categories", { auth: false });
 
 export const fetchCategoryById = (id: string) =>
-  serverFetch<CategorySummary>(`/categories/${id}`);
+  serverFetch<CategorySummary>(`/categories/${id}`, { auth: false });
