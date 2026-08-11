@@ -2,6 +2,7 @@ import Link from "next/link";
 import { fetchMyRecipes } from "@/lib/api/recipe.api";
 import { DataLoadFailed } from "@/components/ui/DataLoadFailed";
 import { VisibilityToggle } from "@/components/recipes/VisibilityToggle";
+import { DeleteRecipeButton } from "@/components/recipes/DeleteRecipeButton";
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +51,7 @@ export default async function MyRecipesPage() {
                 >
                   Edit
                 </Link>
+                <DeleteRecipeButton recipeId={recipe.id} />
               </div>
             </li>
           ))}
