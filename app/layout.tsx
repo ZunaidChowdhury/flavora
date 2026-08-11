@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ToastContainer } from "react-toastify";
 import "../styles/globals.css";
 import { Providers } from "./providers";
 import { ThemeInit } from "../components/ThemeInit";
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ThemeInit />
           {children}
         </Providers>
+        <ToastContainer position="top-right" autoClose={3000} newestOnTop />
       </body>
     </html>
   );

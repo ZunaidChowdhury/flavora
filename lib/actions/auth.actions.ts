@@ -7,6 +7,7 @@ export async function registerUser(body: {
   name: string;
   email: string;
   password: string;
+  image?: string;
 }) {
   const data = await serverMutation<{ token: string; user: UserSummary }>(
     "/auth/register",
@@ -14,7 +15,7 @@ export async function registerUser(body: {
     body
   );
   await setAuthCookie(data.token);
-  return data.user;
+  return data;
 }
 
 export async function loginUser(body: { email: string; password: string }) {
@@ -24,7 +25,7 @@ export async function loginUser(body: { email: string; password: string }) {
     body
   );
   await setAuthCookie(data.token);
-  return data.user;
+  return data;
 }
 
 export async function logoutUser() {

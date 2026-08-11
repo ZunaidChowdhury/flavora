@@ -4,6 +4,7 @@ export type UserSummary = {
   id: string;
   name: string;
   email: string;
+  image?: string | null;
   role: "USER" | "ADMIN";
   status: "ACTIVE" | "INACTIVE" | "ARCHIVED";
   createdAt: string;
