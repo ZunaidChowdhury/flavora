@@ -257,7 +257,7 @@ export function RecipesTable({
         <Pagination.Summary>
           Showing {startItem}-{endItem} of {total} results
         </Pagination.Summary>
-        <Pagination.Content>
+        <Pagination.Content className="flex flex-wrap">
           <Pagination.Item>
             <Pagination.Previous
               isDisabled={currentPage === 1}

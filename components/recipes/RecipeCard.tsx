@@ -23,10 +23,10 @@ export function RecipeCard({ recipe }: { recipe: RecipeSummary }) {
           </div>
         )}
         <div className="flex flex-1 flex-col gap-1 p-4">
-          <h3 className="line-clamp-2 font-semibold text-foreground">
+          <h3 className="line-clamp-2 break-words font-semibold text-foreground">
             {recipe.title}
           </h3>
-          <p className="line-clamp-2 text-sm text-muted">{recipe.description}</p>
+          <p className="line-clamp-2 break-words text-sm text-muted">{recipe.description}</p>
           <div className="mt-2 flex items-center justify-between text-xs text-muted">
             <span>{recipe.category.name}</span>
             <span>{recipe.author.name}</span>
