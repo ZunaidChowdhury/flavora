@@ -65,3 +65,18 @@ export type AdminStats = {
 
 export const fetchAdminStats = () =>
   serverFetch<AdminStats>("/recipes/admin/stats");
+
+export type AdminRecipe = RecipeSummary & {
+  status: "ACTIVE" | "INACTIVE" | "ARCHIVED";
+  _count: { reviews: number; favoritedBy: number };
+};
+
+export type AdminRecipeListResult = {
+  recipes: AdminRecipe[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export const fetchAdminRecipes = (page = 1, limit = 10) =>
+  serverFetch<AdminRecipeListResult>(`/recipes/admin?page=${page}&limit=${limit}`);
