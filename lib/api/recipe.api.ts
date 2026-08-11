@@ -39,11 +39,15 @@ export const fetchPublicRecipes = (params: RecipeListParams = {}) => {
   if (params.sort) qs.set("sort", params.sort);
   if (params.page) qs.set("page", String(params.page));
   if (params.limit) qs.set("limit", String(params.limit));
-  return serverFetch<RecipeListResult>(`/recipes?${qs.toString()}`);
+  return serverFetch<RecipeListResult>(`/recipes?${qs.toString()}`, {
+    auth: false,
+  });
 };
 
 export const fetchRecipeById = (id: string) =>
-  serverFetch<RecipeSummary & { reviews: ReviewSummary[] }>(`/recipes/${id}`);
+  serverFetch<RecipeSummary & { reviews: ReviewSummary[] }>(`/recipes/${id}`, {
+    auth: false,
+  });
 
 export const fetchMyRecipes = () =>
   serverFetch<RecipeSummary[]>("/recipes/mine");
