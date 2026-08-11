@@ -54,3 +54,14 @@ export const fetchMyRecipes = () =>
 
 export const fetchMyFavorites = () =>
   serverFetch<RecipeSummary[]>("/recipes/favorites/mine");
+
+export type AdminStats = {
+  totalUsers: number;
+  totalRecipes: number;
+  totalReviews: number;
+  totalCategories: number;
+  recipesByCategory: { name: string; count: number }[];
+};
+
+export const fetchAdminStats = () =>
+  serverFetch<AdminStats>("/recipes/admin/stats");
