@@ -3,33 +3,20 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Avatar,
-  Button,
-  Chip,
-  ListBox,
-  Modal,
-  Pagination,
-  Select,
-  Table,
-} from "@heroui/react";
-import { FiTrash2 } from "react-icons/fi";
+  FiChevronLeft,
+  FiChevronRight,
+  FiMoreHorizontal,
+  FiShield,
+  FiTrash2,
+  FiUser,
+} from "react-icons/fi";
 import { toast } from "react-toastify";
 import { deleteUser, updateUserRole } from "@/lib/actions/user.actions";
 import { useAppSelector } from "@/store/hooks";
 import type { UserSummary } from "@/lib/api/user.api";
 
-const ROLE_OPTIONS: { id: "USER" | "ADMIN"; label: string }[] = [
-  { id: "USER", label: "USER" },
-  { id: "ADMIN", label: "ADMIN" },
-];
-
 function initials(name: string) {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+  return name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
 }
 
 function formatDate(value: string) {
@@ -40,27 +27,26 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-function statusColor(status: UserSummary["status"]) {
-  if (status === "ACTIVE") return "success";
-  if (status === "INACTIVE") return "warning";
-  return "danger";
+function StatusBadge({ status }: { status: UserSummary["status"] }) {
+  const map: Record<string, string> = {
+    ACTIVE: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+    INACTIVE: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+    ARCHIVED: "bg-red-500/10 text-red-500 border-red-500/20",
+  };
+  return (
+    <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${map[status] ?? map.ARCHIVED}`}>
+      {status}
+    </span>
+  );
 }
 
-function UserRoleEditor({
-  user,
-  isSelf,
-}: {
-  user: UserSummary;
-  isSelf: boolean;
-}) {
+function RoleSelect({ user, isSelf }: { user: UserSummary; isSelf: boolean }) {
   const router = useRouter();
   const [isUpdating, setIsUpdating] = useState(false);
 
-  async function onSelectionChange(key: React.Key | null) {
-    if (key == null) return;
-    const next = String(key) as "USER" | "ADMIN";
+  async function onChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const next = e.target.value as "USER" | "ADMIN";
     if (next === user.role) return;
-
     setIsUpdating(true);
     try {
       await updateUserRole(user.id, next);
@@ -73,39 +59,24 @@ function UserRoleEditor({
   }
 
   return (
-    <Select
-      aria-label="Role"
-      selectedKey={user.role}
-      isDisabled={isSelf || isUpdating}
-      onSelectionChange={onSelectionChange}
-      className="w-28"
-    >
-      <Select.Trigger>
-        <Select.Value />
-        <Select.Indicator />
-      </Select.Trigger>
-      <Select.Popover>
-        <ListBox>
-          {ROLE_OPTIONS.map((option) => (
-            <ListBox.Item key={option.id} id={option.id}>
-              {option.label}
-            </ListBox.Item>
-          ))}
-        </ListBox>
-      </Select.Popover>
-    </Select>
+    <div className="relative inline-block">
+      <select
+        value={user.role}
+        disabled={isSelf || isUpdating}
+        onChange={onChange}
+        className="cursor-pointer appearance-none rounded-lg border border-border/60 bg-field py-1.5 pl-3 pr-7 text-xs font-medium text-foreground focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <option value="USER">USER</option>
+        <option value="ADMIN">ADMIN</option>
+      </select>
+      <FiShield className="pointer-events-none absolute right-2 top-1/2 size-3 -translate-y-1/2 text-muted" />
+    </div>
   );
 }
 
-function UserDeleteButton({
-  user,
-  isSelf,
-}: {
-  user: UserSummary;
-  isSelf: boolean;
-}) {
+function DeleteUserButton({ user, isSelf }: { user: UserSummary; isSelf: boolean }) {
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   async function confirm() {
@@ -113,7 +84,7 @@ function UserDeleteButton({
     try {
       await deleteUser(user.id);
       toast.success("User deleted");
-      setIsOpen(false);
+      setOpen(false);
       router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to delete user");
@@ -122,47 +93,143 @@ function UserDeleteButton({
   }
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={setIsOpen}>
-      <Button
-        isIconOnly
-        size="sm"
-        variant="danger-soft"
-        isDisabled={isSelf}
-        onPress={() => setIsOpen(true)}
+    <>
+      <button
+        type="button"
+        disabled={isSelf}
+        onClick={() => setOpen(true)}
         aria-label={`Delete ${user.name}`}
+        className="inline-flex size-8 cursor-pointer items-center justify-center rounded-lg border border-red-500/20 bg-red-500/8 text-red-500 transition-colors hover:bg-red-500/15 disabled:cursor-not-allowed disabled:opacity-40"
       >
-        <FiTrash2 className="size-4" />
-      </Button>
-      <Modal.Backdrop variant="blur">
-        <Modal.Container>
-          <Modal.Dialog className="sm:max-w-sm">
-            <Modal.CloseTrigger />
-            <Modal.Header>
-              <Modal.Heading>Delete this user?</Modal.Heading>
-            </Modal.Header>
-            <Modal.Body>
+        <FiTrash2 className="size-3.5" />
+      </button>
+
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-foreground/30 backdrop-blur-sm"
+            onClick={() => !isDeleting && setOpen(false)}
+          />
+          {/* Dialog */}
+          <div className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-2xl">
+            {/* Header */}
+            <div className="flex items-center gap-3 border-b border-border/50 bg-surface-secondary/60 px-5 py-4">
+              <span className="flex size-9 items-center justify-center rounded-xl bg-red-500/10">
+                <FiTrash2 className="size-4 text-red-500" />
+              </span>
+              <h3 className="text-base font-semibold text-foreground">Delete User</h3>
+            </div>
+            {/* Body */}
+            <div className="px-5 py-4">
               <p className="text-sm text-muted">
-                <span className="font-medium text-foreground">{user.name}</span>{" "}
-                will be soft-deleted and can no longer log in. This action
-                can&apos;t be undone.
+                <span className="font-semibold text-foreground">{user.name}</span> will
+                be soft-deleted and can no longer log in. This action can&apos;t be undone.
               </p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button slot="close" variant="outline">
-                Cancel
-              </Button>
-              <Button
-                variant="danger"
-                isDisabled={isDeleting}
-                onPress={confirm}
+            </div>
+            {/* Footer */}
+            <div className="flex justify-end gap-2 border-t border-border/50 bg-surface-secondary/40 px-5 py-3.5">
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                disabled={isDeleting}
+                className="cursor-pointer rounded-xl border border-border/70 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-surface-secondary disabled:opacity-50"
               >
-                {isDeleting ? "Deleting..." : "Delete"}
-              </Button>
-            </Modal.Footer>
-          </Modal.Dialog>
-        </Modal.Container>
-      </Modal.Backdrop>
-    </Modal>
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirm}
+                disabled={isDeleting}
+                className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isDeleting && (
+                  <svg className="size-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                  </svg>
+                )}
+                {isDeleting ? "Deleting…" : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function Pagination({
+  currentPage,
+  totalPages,
+  total,
+  startItem,
+  endItem,
+  go,
+}: {
+  currentPage: number;
+  totalPages: number;
+  total: number;
+  startItem: number;
+  endItem: number;
+  go: (p: number) => void;
+}) {
+  function pages(): (number | "…")[] {
+    const out: (number | "…")[] = [1];
+    if (currentPage > 3) out.push("…");
+    const s = Math.max(2, currentPage - 1);
+    const e = Math.min(totalPages - 1, currentPage + 1);
+    for (let i = s; i <= e; i++) out.push(i);
+    if (currentPage < totalPages - 2) out.push("…");
+    if (totalPages > 1) out.push(totalPages);
+    return out;
+  }
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border/60 bg-surface px-5 py-3">
+      <span className="text-sm text-muted">
+        Showing <span className="font-medium text-foreground">{startItem}–{endItem}</span> of{" "}
+        <span className="font-medium text-foreground">{total}</span>
+      </span>
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          onClick={() => go(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="inline-flex size-8 cursor-pointer items-center justify-center rounded-lg border border-border/60 text-muted transition-colors hover:border-primary/40 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <FiChevronLeft className="size-4" />
+        </button>
+        {pages().map((p, i) =>
+          p === "…" ? (
+            <span key={`e${i}`} className="flex size-8 items-center justify-center text-muted">
+              <FiMoreHorizontal className="size-4" />
+            </span>
+          ) : (
+            <button
+              key={p}
+              type="button"
+              onClick={() => go(Number(p))}
+              className={`inline-flex size-8 cursor-pointer items-center justify-center rounded-lg text-sm font-medium transition-colors ${
+                p === currentPage
+                  ? "bg-primary text-white shadow-sm shadow-primary/30"
+                  : "border border-border/60 text-foreground hover:border-primary/40 hover:text-primary"
+              }`}
+            >
+              {p}
+            </button>
+          )
+        )}
+        <button
+          type="button"
+          onClick={() => go(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="inline-flex size-8 cursor-pointer items-center justify-center rounded-lg border border-border/60 text-muted transition-colors hover:border-primary/40 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <FiChevronRight className="size-4" />
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -182,6 +249,8 @@ export function UsersTable({
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const currentPage = Math.min(page, totalPages);
+  const startItem = (currentPage - 1) * limit + 1;
+  const endItem = Math.min(currentPage * limit, total);
 
   function go(target: number) {
     if (target < 1 || target > totalPages || target === currentPage) return;
@@ -191,139 +260,83 @@ export function UsersTable({
     router.push(`/admin/users${qs ? `?${qs}` : ""}`);
   }
 
-  function getPageNumbers(): (number | "ellipsis")[] {
-    const pages: (number | "ellipsis")[] = [];
-
-    pages.push(1);
-
-    if (currentPage > 3) {
-      pages.push("ellipsis");
-    }
-
-    const start = Math.max(2, currentPage - 1);
-    const end = Math.min(totalPages - 1, currentPage + 1);
-
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-
-    if (currentPage < totalPages - 2) {
-      pages.push("ellipsis");
-    }
-
-    pages.push(totalPages);
-
-    return pages;
-  }
-
-  const startItem = (currentPage - 1) * limit + 1;
-  const endItem = Math.min(currentPage * limit, total);
-
   return (
     <div className="flex flex-col gap-4">
-      <Table className="rounded-2xl border border-border/60 bg-surface">
-        <Table.ScrollContainer>
-          <Table.Content className="min-w-[640px]">
-            <Table.Header>
-              <Table.Column isRowHeader>User</Table.Column>
-              <Table.Column>Status</Table.Column>
-              <Table.Column>Role</Table.Column>
-              <Table.Column>Joined</Table.Column>
-              <Table.Column className="text-end">Actions</Table.Column>
-            </Table.Header>
-            <Table.Body>
-              {users.map((user) => {
-                const isSelf = user.id === currentUserId;
-                return (
-                  <Table.Row key={user.id}>
-                    <Table.Cell>
-                      <div className="flex items-center gap-3">
-                        <Avatar size="sm" className="size-9 rounded-xl">
-                          {user.image ? (
-                            <Avatar.Image src={user.image} alt={user.name} />
-                          ) : null}
-                          <Avatar.Fallback>{initials(user.name)}</Avatar.Fallback>
-                        </Avatar>
-                        <div className="min-w-0">
-                          <p className="font-medium text-foreground">
-                            {user.name}
-                            {isSelf && (
-                              <span className="ml-1 text-sm font-normal text-muted">
-                                (you)
-                              </span>
-                            )}
-                          </p>
-                          <p className="truncate text-sm text-muted">
-                            {user.email}
-                          </p>
-                        </div>
-                      </div>
-                    </Table.Cell>
-                    <Table.Cell>
-                      <Chip size="sm" variant="soft" color={statusColor(user.status)}>
-                        {user.status}
-                      </Chip>
-                    </Table.Cell>
-                    <Table.Cell>
-                      <UserRoleEditor user={user} isSelf={isSelf} />
-                    </Table.Cell>
-                    <Table.Cell>
-                      <span className="text-sm text-muted">
-                        {formatDate(user.createdAt)}
-                      </span>
-                    </Table.Cell>
-                    <Table.Cell className="text-end">
-                      <UserDeleteButton user={user} isSelf={isSelf} />
-                    </Table.Cell>
-                  </Table.Row>
-                );
-              })}
-            </Table.Body>
-          </Table.Content>
-        </Table.ScrollContainer>
-      </Table>
+      {/* Table card */}
+      <div className="overflow-hidden rounded-2xl border border-border/70 bg-surface shadow-sm">
+        {/* Table header */}
+        <div className="grid min-w-[640px] grid-cols-[2fr_1fr_1fr_1fr_auto] gap-4 border-b border-border/50 bg-surface-secondary/60 px-5 py-3">
+          {["User", "Status", "Role", "Joined", "Actions"].map((h, i) => (
+            <span
+              key={h}
+              className={`text-xs font-semibold uppercase tracking-wider text-muted ${i === 4 ? "text-right" : ""}`}
+            >
+              {h}
+            </span>
+          ))}
+        </div>
 
-      <Pagination className="w-full">
-        <Pagination.Summary>
-          Showing {startItem}-{endItem} of {total} results
-        </Pagination.Summary>
-        <Pagination.Content className="flex flex-wrap">
-          <Pagination.Item>
-            <Pagination.Previous
-              isDisabled={currentPage === 1}
-              onPress={() => go(currentPage - 1)}
-            >
-              <Pagination.PreviousIcon />
-              <span>Previous</span>
-            </Pagination.Previous>
-          </Pagination.Item>
-          {getPageNumbers().map((p, i) =>
-            p === "ellipsis" ? (
-              <Pagination.Item key={`ellipsis-${i}`}>
-                <Pagination.Ellipsis />
-              </Pagination.Item>
-            ) : (
-              <Pagination.Item key={p}>
-                <Pagination.Link
-                  isActive={p === currentPage}
-                  onPress={() => go(p)}
-                >
-                  {p}
-                </Pagination.Link>
-              </Pagination.Item>
-            )
-          )}
-          <Pagination.Item>
-            <Pagination.Next
-              isDisabled={currentPage === totalPages}
-              onPress={() => go(currentPage + 1)}
-            >
-              <span>Next</span>
-              <Pagination.NextIcon />
-            </Pagination.Next>
-          </Pagination.Item>
-        </Pagination.Content>
-      </Pagination>
+        {/* Rows */}
+        <div className="min-w-[640px] divide-y divide-border/40">
+          {users.map((user) => {
+            const isSelf = user.id === currentUserId;
+            return (
+              <div
+                key={user.id}
+                className="grid grid-cols-[2fr_1fr_1fr_1fr_auto] items-center gap-4 px-5 py-3.5 transition-colors hover:bg-surface-secondary/30"
+              >
+                {/* User */}
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="flex size-9 shrink-0 overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-primary to-accent">
+                    {user.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={user.image} alt={user.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center text-xs font-bold text-white">
+                        {initials(user.name)}
+                      </span>
+                    )}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-foreground">
+                      {user.name}
+                      {isSelf && (
+                        <span className="ml-1.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                          you
+                        </span>
+                      )}
+                    </p>
+                    <p className="truncate text-xs text-muted">{user.email}</p>
+                  </div>
+                </div>
+
+                {/* Status */}
+                <div><StatusBadge status={user.status} /></div>
+
+                {/* Role */}
+                <div><RoleSelect user={user} isSelf={isSelf} /></div>
+
+                {/* Joined */}
+                <span className="text-sm text-muted">{formatDate(user.createdAt)}</span>
+
+                {/* Actions */}
+                <div className="flex justify-end">
+                  <DeleteUserButton user={user} isSelf={isSelf} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        total={total}
+        startItem={startItem}
+        endItem={endItem}
+        go={go}
+      />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Link } from "@heroui/react";
+import Link from "next/link";
 import { FiHeart } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { getMyFavorites, toggleRecipeFavorite } from "@/lib/actions/recipe.actions";
@@ -42,11 +42,12 @@ export function FavoriteToggle({
     setIsFavorited(favorites.includes(recipeId));
   }, [favorites, recipeId]);
 
+  /* ── Not logged in ───────────────────────────── */
   if (!isAuthenticated) {
     return (
       <Link
         href="/login"
-        className="inline-flex items-center gap-2 rounded-xl border border-border bg-background/80 px-3 py-2 text-sm font-medium text-foreground backdrop-blur transition-colors hover:bg-surface"
+        className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border/70 bg-surface px-4 py-2.5 text-sm font-medium text-foreground/80 shadow-sm transition-all duration-200 hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
       >
         <FiHeart className="size-4" />
         {!isIconOnly && "Login to favorite"}
@@ -61,7 +62,7 @@ export function FavoriteToggle({
       const res = await toggleRecipeFavorite(recipeId);
       setIsFavorited(res.isFavorited);
       toast.success(
-        res.isFavorited ? "Added to favorites" : "Removed from favorites"
+        res.isFavorited ? "Added to favorites ❤️" : "Removed from favorites"
       );
     } catch (err) {
       setIsFavorited(!next);
@@ -69,17 +70,26 @@ export function FavoriteToggle({
     }
   }
 
+  /* ── Logged in ───────────────────────────────── */
   return (
-    <Button
-      isIconOnly={isIconOnly}
-      variant={isFavorited ? "primary" : "outline"}
-      isDisabled={!ready && isAuthenticated}
-      onPress={toggle}
+    <button
+      type="button"
+      onClick={toggle}
+      disabled={!ready && isAuthenticated}
       aria-pressed={isFavorited}
       aria-label={isFavorited ? "Remove from favorites" : "Add to favorites"}
+      className={`group inline-flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-semibold shadow-sm transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${
+        isFavorited
+          ? "border-primary/40 bg-primary text-white shadow-primary/25 hover:brightness-110"
+          : "border-border/70 bg-surface text-foreground/80 hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
+      }`}
     >
-      <FiHeart className={`size-4 ${isFavorited ? "fill-current" : ""}`} />
-      {!isIconOnly && (isFavorited ? "Favorited" : "Favorite")}
-    </Button>
+      <FiHeart
+        className={`size-4 transition-transform duration-200 group-hover:scale-110 ${
+          isFavorited ? "fill-current" : ""
+        }`}
+      />
+      {!isIconOnly && (isFavorited ? "Favorited" : "Add to Favorite")}
+    </button>
   );
 }
