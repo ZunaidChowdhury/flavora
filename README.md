@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🍳 Flavora — Community Cookbook Frontend
 
-## Getting Started
+Flavora is a premium, modern recipe sharing and discovery platform. This repository contains the Next.js frontend application, built with a polished user interface, animations, and data state synchronization.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## ✨ Features
+
+- **🌅 Immersive Hero Slider**: Auto-playing recipe showcase with smooth scale animations, glowing color backdrops, and active pagination controls.
+- **🏷️ Interactive Explorer**: Discover kitchen-fresh recipes filtered dynamically by categories.
+- **❤️ Favourites Toggle**: Instantly add/remove recipes to your profile book with micro-animated states.
+- **⭐ Interactive Reviews**: Leave custom ratings using a responsive star interaction, including character validation and detailed client-side statistics.
+- **👤 Dashboard Profile**: overlapping avatar profile cards displaying registration timestamps, activity metrics, and role badges.
+- **📑 Admin Center**: Clean layout interfaces to manage public recipes (visibility toggle + publish status locks) and user moderation panels.
+- **🎨 Modern Design Tokens**: Curated warm orange color themes, glassmorphic dropdowns, custom select inputs, and a custom SVG loading spinner.
+
+---
+
+## 🛠️ Technology Stack
+
+- **Framework**: [Next.js 16 (App Router)](https://nextjs.org/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **State Management**: [Redux Toolkit](https://redux-toolkit.js.org/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **File Uploads**: [UploadThing React](https://uploadthing.com/)
+- **Icons**: [React Icons](https://react-icons.github.io/react-icons/)
+- **Feedback**: [React Toastify](https://github.com/fkhadra/react-toastify)
+
+---
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+Ensure you have [Node.js](https://nodejs.org/) (v20+ recommended) installed.
+
+### 2. Environment Setup
+Create a `.env` file in the root directory and add the following:
+```env
+NEXT_PUBLIC_API_BASE_URL=http://localhost:5000/api
+
+# UploadThing Credentials
+UPLOADTHING_SECRET=your_uploadthing_secret
+UPLOADTHING_APP_ID=your_uploadthing_app_id
+UPLOADTHING_TOKEN=your_uploadthing_token
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Installation
+Install the project dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 4. Running Locally
+Launch the Next.js development server:
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 📦 Build & Deploy
 
-To learn more about Next.js, take a look at the following resources:
+Compile the production-optimized Next.js bundle:
+```bash
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This frontend is configured for deployment on the **Vercel** platform.
