@@ -49,8 +49,8 @@ export default async function RecipeDetailPage({
       ) : null}
 
       <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">{recipe.title}</h1>
+        <div className="min-w-0">
+          <h1 className="break-words text-3xl font-bold text-foreground">{recipe.title}</h1>
           <p className="mt-1 text-sm text-muted">
             by {recipe.author.name} · {recipe.category.name}
           </p>
@@ -58,7 +58,7 @@ export default async function RecipeDetailPage({
         <FavoriteToggle recipeId={recipe.id} />
       </div>
 
-      <p className="mt-4 text-foreground">{recipe.description}</p>
+      <p className="mt-4 break-words text-foreground">{recipe.description}</p>
 
       <h2 className="mt-8 text-xl font-semibold text-foreground">
         Ingredients
@@ -72,7 +72,7 @@ export default async function RecipeDetailPage({
       <h2 className="mt-8 text-xl font-semibold text-foreground">
         Instructions
       </h2>
-      <p className="mt-2 whitespace-pre-line text-foreground">
+      <p className="mt-2 break-words whitespace-pre-line text-foreground">
         {recipe.instructions}
       </p>
 

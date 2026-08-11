@@ -131,6 +131,7 @@ export function RecipeForm({
               <div key={i} className="flex items-center gap-2">
                 <Input
                   variant="secondary"
+                  className="min-w-0 flex-1"
                   value={ing}
                   onChange={(e) => setIngredient(i, e.target.value)}
                   placeholder="e.g. 2 cups of flour"
