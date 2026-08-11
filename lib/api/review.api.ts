@@ -12,7 +12,8 @@ export type ReviewSummary = {
 
 export const fetchReviews = (recipeId?: string) =>
   serverFetch<ReviewSummary[]>(
-    recipeId ? `/reviews?recipeId=${recipeId}` : "/reviews"
+    recipeId ? `/reviews?recipeId=${recipeId}` : "/reviews",
+    { auth: false }
   );
 
 export const fetchReviewById = (id: string) =>

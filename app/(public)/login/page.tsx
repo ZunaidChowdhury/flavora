@@ -1,71 +1,185 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, Card, Form, Input, Label, TextField } from "@heroui/react";
+import { Button, Input, Label, TextField } from "@heroui/react";
+import { FiEye, FiEyeOff, FiLock, FiMail } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { loginUser } from "@/lib/actions/auth.actions";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setCredentials } from "@/store/slices/authSlice";
+
+const inputClass =
+  "w-full rounded-lg border border-foreground/10 bg-foreground/[0.03] py-2.5 pl-11 pr-4 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all duration-200";
+const passwordInputClass =
+  "w-full rounded-lg border border-foreground/10 bg-foreground/[0.03] py-2.5 pl-11 pr-12 text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all duration-200";
 
 export default function LoginPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const isDark = useAppSelector((s) => s.theme.mode) === "dark";
+  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+    form?: string;
+  }>({});
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleChange(field: "email" | "password", value: string) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: undefined, form: undefined }));
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const next: typeof errors = {};
+    if (!form.email) next.email = "Email is required";
+    else if (!form.email.includes("@")) next.email = "Enter a valid email";
+    if (!form.password) next.password = "Password is required";
+    setErrors(next);
+    if (Object.keys(next).length > 0) return;
+
     setIsSubmitting(true);
     try {
-      const form = new FormData(e.currentTarget);
       const data = await loginUser({
-        email: String(form.get("email") ?? ""),
-        password: String(form.get("password") ?? ""),
+        email: form.email,
+        password: form.password,
       });
       dispatch(setCredentials({ user: data.user, token: data.token }));
-      toast.success("Welcome back");
+      toast.success("Welcome back to Flavora");
       router.push("/dashboard");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Invalid email or password");
+      setErrors({
+        form: err instanceof Error ? err.message : "Invalid email or password",
+      });
       setIsSubmitting(false);
     }
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center px-4 py-16">
-      <Card className="w-full max-w-md">
-        <Card.Header>
-          <Card.Title>Welcome back</Card.Title>
-          <Card.Description>Log in to your Flavora account.</Card.Description>
-        </Card.Header>
-        <Form onSubmit={onSubmit}>
-          <Card.Content className="flex flex-col gap-4">
-            <TextField
-              isRequired
-              name="email"
-              type="email"
-              validate={(v) => (v.includes("@") ? null : "Enter a valid email")}
-            >
-              <Label>Email</Label>
-              <Input variant="secondary" placeholder="you@example.com" />
-            </TextField>
-            <TextField isRequired name="password" type="password">
-              <Label>Password</Label>
-              <Input variant="secondary" placeholder="Your password" />
-            </TextField>
-          </Card.Content>
-          <Card.Footer className="flex flex-col gap-2">
-            <Button
-              type="submit"
-              variant="primary"
-              fullWidth
-              isDisabled={isSubmitting}
-            >
-              Log in
-            </Button>
-          </Card.Footer>
-        </Form>
-      </Card>
+    <div className="relative flex flex-1 items-center justify-center px-4 py-12">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -z-10 h-[380px] w-[380px] rounded-full bg-primary/10 blur-[90px]"
+      />
+      <div
+        className={`w-full max-w-md rounded-2xl border px-6 py-8 shadow-xl transition-all duration-300 ${
+          isDark
+            ? "border-white/5 bg-linear-to-b from-surface to-surface-secondary"
+            : "border-border/60 bg-surface"
+        }`}
+      >
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            Welcome back
+          </h1>
+          <p className="mt-1.5 text-sm text-foreground/70">
+            Log in to{" "}
+            <span className="font-semibold text-primary">Flavora</span>
+            {" "}— your cooking community
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+          {errors.form && (
+            <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-3.5 py-2.5">
+              <span className="text-sm font-medium text-rose-400">
+                {errors.form}
+              </span>
+            </div>
+          )}
+
+          <TextField
+            isInvalid={!!errors.email}
+            className="flex flex-col gap-1.5"
+          >
+            <Label className="text-sm font-medium text-foreground/90">
+              Email Address
+            </Label>
+            <div className="relative flex items-center">
+              <FiMail
+                className="absolute left-3.5 shrink-0 text-foreground/40"
+                width={16}
+                height={16}
+              />
+              <Input
+                type="email"
+                placeholder="name@domain.com"
+                value={form.email}
+                onChange={(e) => handleChange("email", e.target.value)}
+                className={inputClass}
+              />
+            </div>
+            {errors.email && (
+              <span className="mt-0.5 text-xs font-medium text-rose-400">
+                {errors.email}
+              </span>
+            )}
+          </TextField>
+
+          <TextField
+            isInvalid={!!errors.password}
+            className="flex flex-col gap-1.5"
+          >
+            <Label className="text-sm font-medium text-foreground/90">
+              Password
+            </Label>
+            <div className="relative flex items-center">
+              <FiLock
+                className="absolute left-3.5 shrink-0 text-foreground/40"
+                width={16}
+                height={16}
+              />
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                value={form.password}
+                onChange={(e) => handleChange("password", e.target.value)}
+                className={passwordInputClass}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute right-3 cursor-pointer text-foreground/40 transition-colors hover:text-foreground focus:outline-none focus-visible:outline-2 focus-visible:outline-primary"
+              >
+                {showPassword ? (
+                  <FiEyeOff width={18} height={18} />
+                ) : (
+                  <FiEye width={18} height={18} />
+                )}
+              </button>
+            </div>
+            {errors.password && (
+              <span className="mt-0.5 text-xs font-medium text-rose-400">
+                {errors.password}
+              </span>
+            )}
+          </TextField>
+
+          <Button
+            type="submit"
+            fullWidth
+            isDisabled={isSubmitting}
+            className="mt-2 h-11 w-full cursor-pointer rounded-lg bg-linear-to-r from-primary-hover to-primary text-sm font-bold text-background shadow-lg shadow-primary/20 transition-all duration-300 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-primary"
+          >
+            {isSubmitting ? "Logging in…" : "Log in"}
+          </Button>
+        </form>
+
+        <p className="mt-6 text-center text-sm text-foreground/70">
+          New to Flavora?{" "}
+          <Link
+            href="/register"
+            className="ml-1 font-semibold text-primary transition-colors duration-150 hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary"
+          >
+            Create an account
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
