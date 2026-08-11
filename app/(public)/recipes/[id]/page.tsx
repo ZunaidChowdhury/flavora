@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { ApiError } from "@/lib/core/server";
 import { fetchRecipeById } from "@/lib/api/recipe.api";
-import { FavoriteButton } from "@/components/recipes/FavoriteButton";
+import { FavoriteToggle } from "@/components/recipes/FavoriteToggle";
 import { ReviewForm } from "@/components/recipes/ReviewForm";
 import { NotFound } from "@/components/ui/NotFound";
 
@@ -55,7 +55,7 @@ export default async function RecipeDetailPage({
             by {recipe.author.name} · {recipe.category.name}
           </p>
         </div>
-        <FavoriteButton recipeId={recipe.id} />
+        <FavoriteToggle recipeId={recipe.id} />
       </div>
 
       <p className="mt-4 text-foreground">{recipe.description}</p>
