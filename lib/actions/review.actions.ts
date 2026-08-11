@@ -1,15 +1,22 @@
+"use server";
+
 import { serverMutation } from "../core/server";
 
-export const createReview = (body: {
+export async function createReview(body: {
   recipeId: string;
   rating: number;
   comment: string;
-}) => serverMutation<unknown>("/reviews", "POST", body);
+}) {
+  return serverMutation<unknown>("/reviews", "POST", body);
+}
 
-export const updateReview = (
+export async function updateReview(
   id: string,
   body: { rating?: number; comment?: string }
-) => serverMutation<unknown>(`/reviews/${id}`, "PUT", body);
+) {
+  return serverMutation<unknown>(`/reviews/${id}`, "PUT", body);
+}
 
-export const deleteReview = (id: string) =>
-  serverMutation<null>(`/reviews/${id}`, "DELETE");
+export async function deleteReview(id: string) {
+  return serverMutation<null>(`/reviews/${id}`, "DELETE");
+}

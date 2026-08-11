@@ -1,4 +1,7 @@
+"use server";
+
 import { serverMutation } from "../core/server";
+import { fetchMyFavorites } from "../api/recipe.api";
 
 export type RecipeInput = {
   title: string;
@@ -9,19 +12,34 @@ export type RecipeInput = {
   image?: string | null;
 };
 
-export const createRecipe = (body: RecipeInput) =>
-  serverMutation<unknown>("/recipes", "POST", body);
+export async function createRecipe(body: RecipeInput) {
+  return serverMutation<unknown>("/recipes", "POST", body);
+}
 
-export const updateRecipe = (id: string, body: Partial<RecipeInput>) =>
-  serverMutation<unknown>(`/recipes/${id}`, "PUT", body);
+export async function updateRecipe(id: string, body: Partial<RecipeInput>) {
+  return serverMutation<unknown>(`/recipes/${id}`, "PUT", body);
+}
 
-export const deleteRecipe = (id: string) =>
-  serverMutation<null>(`/recipes/${id}`, "DELETE");
+export async function deleteRecipe(id: string) {
+  return serverMutation<null>(`/recipes/${id}`, "DELETE");
+}
 
-export const updateRecipeVisibility = (
+export async function updateRecipeVisibility(
   id: string,
   visibility: "PUBLIC" | "PRIVATE"
-) => serverMutation<unknown>(`/recipes/${id}/visibility`, "PUT", { visibility });
+) {
+  return serverMutation<unknown>(`/recipes/${id}/visibility`, "PUT", {
+    visibility,
+  });
+}
 
-export const toggleRecipeFavorite = (id: string) =>
-  serverMutation<{ isFavorited: boolean }>(`/recipes/${id}/favorite`, "POST");
+export async function toggleRecipeFavorite(id: string) {
+  return serverMutation<{ isFavorited: boolean }>(
+    `/recipes/${id}/favorite`,
+    "POST"
+  );
+}
+
+export async function getMyFavorites() {
+  return fetchMyFavorites();
+}
