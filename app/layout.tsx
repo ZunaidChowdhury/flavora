@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ToastContainer } from "react-toastify";
 import "../styles/globals.css";
 import { Providers } from "./providers";
 import { ThemeInit } from "../components/ThemeInit";
+import { ToastProvider } from "../components/ToastProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,9 +29,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-full flex flex-col">
         <Providers>
           <ThemeInit />
+          <ToastProvider />
           {children}
         </Providers>
-        <ToastContainer position="top-right" autoClose={3000} newestOnTop />
       </body>
     </html>
   );

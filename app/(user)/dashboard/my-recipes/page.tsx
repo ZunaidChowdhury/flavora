@@ -15,7 +15,7 @@ export default async function MyRecipesPage() {
         <h1 className="text-2xl font-bold text-foreground">My Recipes</h1>
         <Link
           href="/dashboard/my-recipes/new"
-          className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-hover"
+          className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-background transition-colors hover:bg-primary-hover"
         >
           New Recipe
         </Link>
