@@ -54,3 +54,29 @@ export const fetchMyRecipes = () =>
 
 export const fetchMyFavorites = () =>
   serverFetch<RecipeSummary[]>("/recipes/favorites/mine");
+
+export type AdminStats = {
+  totalUsers: number;
+  totalRecipes: number;
+  totalReviews: number;
+  totalCategories: number;
+  recipesByCategory: { name: string; count: number }[];
+};
+
+export const fetchAdminStats = () =>
+  serverFetch<AdminStats>("/recipes/admin/stats");
+
+export type AdminRecipe = RecipeSummary & {
+  status: "ACTIVE" | "INACTIVE" | "ARCHIVED";
+  _count: { reviews: number; favoritedBy: number };
+};
+
+export type AdminRecipeListResult = {
+  recipes: AdminRecipe[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export const fetchAdminRecipes = (page = 1, limit = 10) =>
+  serverFetch<AdminRecipeListResult>(`/recipes/admin?page=${page}&limit=${limit}`);

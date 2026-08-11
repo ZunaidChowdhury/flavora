@@ -40,6 +40,17 @@ export async function toggleRecipeFavorite(id: string) {
   );
 }
 
+export async function updateRecipeAdminVisibility(
+  id: string,
+  isUnpublishedByAdmin: boolean
+) {
+  return serverMutation<unknown>(
+    `/recipes/${id}/admin-visibility`,
+    "PUT",
+    { isUnpublishedByAdmin }
+  );
+}
+
 export async function getMyFavorites() {
   return fetchMyFavorites();
 }
