@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { fetchMyRecipes } from "@/lib/api/recipe.api";
 import { DataLoadFailed } from "@/components/ui/DataLoadFailed";
-import { Chip } from "@heroui/react";
+import { VisibilityToggle } from "@/components/recipes/VisibilityToggle";
+import { DeleteRecipeButton } from "@/components/recipes/DeleteRecipeButton";
 
 export const dynamic = "force-dynamic";
 
@@ -38,24 +39,19 @@ export default async function MyRecipesPage() {
                   {recipe.description}
                 </p>
               </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <Chip
-                  color={recipe.visibility === "PRIVATE" ? "accent" : "success"}
-                  size="sm"
-                >
-                  {recipe.visibility}
-                </Chip>
-                {recipe.isUnpublishedByAdmin && (
-                  <Chip color="danger" size="sm">
-                    Unpublished
-                  </Chip>
-                )}
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
+                <VisibilityToggle
+                  recipeId={recipe.id}
+                  visibility={recipe.visibility}
+                  isUnpublishedByAdmin={recipe.isUnpublishedByAdmin}
+                />
                 <Link
                   href={`/dashboard/my-recipes/${recipe.id}/edit`}
                   className="text-sm font-medium text-primary hover:underline"
                 >
                   Edit
                 </Link>
+                <DeleteRecipeButton recipeId={recipe.id} />
               </div>
             </li>
           ))}
